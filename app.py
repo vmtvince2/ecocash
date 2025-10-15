@@ -4,6 +4,9 @@ import json
 import uuid
 from flask import Flask, jsonify, request
 
+app = Flask(__name__)
+
+
 @app.route('/payment', methods=['POST'])
 def payment():
     try:
