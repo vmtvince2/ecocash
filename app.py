@@ -13,7 +13,6 @@ def payment():
         
         # Get data from the request
         data = request.json
-        data = request.json
         phone = data.get('phone')
         amount = data.get('amount')
         currency = data.get('currency')     # Default currency for testing
