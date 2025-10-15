@@ -32,7 +32,7 @@ def payment():
             "customerMsisdn": phone,
             "amount": amount,
             "reason": "Payment",
-            "currency": currency,
+           # "currency": currency,
             "sourceReference": new_reference
         })
 
