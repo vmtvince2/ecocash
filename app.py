@@ -1,64 +1,56 @@
-
-import requests
+from flask import Flask, jsonify, request
+import http.client
 import json
 import uuid
-from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-
 
 @app.route('/payment', methods=['POST'])
 def payment():
     try:
-        new_reference = str(uuid.uuid4())
+        # Generate a UUID for the sourceReference
+        source_reference = str(uuid.uuid4())
+        
+        # Get data from the request
+        data = request.json
         data = request.json
         phone = data.get('phone')
         amount = data.get('amount')
-        currency = data.get('currency')
+        currency = data.get('currency')     # Default currency for testing
 
-        if not phone or not amount or not currency:
-            return jsonify({"error": "Missing required fields."}), 400
-
-        # Ensure phone number is formatted as 263 followed by the number
-        if not phone.startswith("263"):
-            if phone.startswith("0"):
-                phone = "263" + phone[1:]  # Remove leading zero and prepend 263
-            else:
-                phone = "263" + phone  # Prepend 263 if no leading zero
-
-        url = "https://developers.ecocash.co.zw/api/ecocash_pay/api/v2/payment/instant/c2b/sandbox"
-
+        # Prepare the payload
         payload = json.dumps({
             "customerMsisdn": phone,
             "amount": amount,
             "reason": "Payment",
             "currency": "USD",
-            "sourceReference": new_reference
+            "sourceReference": source_reference
         })
 
+        # Set the headers
         headers = {
-            'X-API-KEY': 'yfsGMcWVQHFKphbASvhmexrox3FPyNky',
-            'Content-Type': 'application/json'
+            'X-API-KEY': 'yfsGMcWVQHFKphbASvhmexrox3FPyNky',  # Your API key
+            'Content-Type': 'application/json'                 # Content type
         }
 
-        response = requests.post(url, headers=headers, data=payload)
+        # Create a connection to the EcoCash API
+        conn = http.client.HTTPSConnection("developers.ecocash.co.zw")
 
-        if response.status_code == 200:
-            return jsonify({
-                "status": response.status_code,
-                "response": response.json()
-            })
-        else:
-            return jsonify({
-                "status": response.status_code,
-                "error": "Error from external API.",
-                "details": response.text
-            }), response.status_code
+        # Make the POST request
+        conn.request("POST", "/api/ecocash_pay/api/v2/payment/instant/c2b/sandbox", payload, headers)
+
+        # Get the response
+        res = conn.getresponse()
+        data = res.read()
+
+        # Close the connection
+        conn.close()
+
+        # Return the response from the EcoCash API
+        return jsonify(json.loads(data.decode("utf-8"))), res.status
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)  # Run the app in debug mode
