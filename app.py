@@ -17,6 +17,17 @@ def payment():
         amount = data.get('amount')
         currency = data.get('currency')     # Default currency for testing
 
+        if not phone or not amount or not currency:
+            return jsonify({"error": "Missing required fields."}), 400
+
+        # Ensure phone number is formatted as 263 followed by the number
+        if not phone.startswith("263"):
+            if phone.startswith("0"):
+                phone = "263" + phone[1:]  # Remove leading zero and prepend 263
+            else:
+                phone = "263" + phone  # Prepend 263 if no leading zero
+
+
         # Prepare the payload
         payload = json.dumps({
             "customerMsisdn": phone,
