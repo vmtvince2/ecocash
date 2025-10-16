@@ -15,7 +15,7 @@ def payment():
         data = request.json
         phone = data.get('phone')
         amount = data.get('amount')
-        currency = data.get('currency')     # Default currency for testing
+        currency = data.get('currency')  # Default currency for testing
 
         if not phone or not amount or not currency:
             return jsonify({"error": "Missing required fields."}), 400
@@ -27,8 +27,7 @@ def payment():
             else:
                 phone = "263" + phone  # Prepend 263 if no leading zero
 
-
-        # Prepare the payload
+        # Prepare the payload for EcoCash
         payload = json.dumps({
             "customerMsisdn": phone,
             "amount": amount,
@@ -37,7 +36,7 @@ def payment():
             "sourceReference": source_reference
         })
 
-        # Set the headers
+        # Set the headers for EcoCash
         headers = {
             'X-API-KEY': 'yfsGMcWVQHFKphbASvhmexrox3FPyNky',  # Your API key
             'Content-Type': 'application/json'                 # Content type
@@ -46,19 +45,15 @@ def payment():
         # Create a connection to the EcoCash API
         conn = http.client.HTTPSConnection("developers.ecocash.co.zw")
 
-        # Make the POST request
+        # Make the POST request to EcoCash
         conn.request("POST", "/api/ecocash_pay/api/v2/payment/instant/c2b/sandbox", payload, headers)
 
-        # Get the response
+        # Get the response from EcoCash
         res = conn.getresponse()
-        data = res.read()
-
-        # Close the connection
+        eco_response = res.read()
         conn.close()
 
-        # Return the response from the EcoCash API
-        return jsonify(json.loads(data.decode("utf-8"))), res.status
-
+        # Send the sourceReference and phone number to the specified endpoint
         callback_payload = json.dumps({
             "sourceReference": source_reference,
             "phone": phone
