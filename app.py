@@ -59,6 +59,33 @@ def payment():
         # Return the response from the EcoCash API
         return jsonify(json.loads(data.decode("utf-8"))), res.status
 
+        callback_payload = json.dumps({
+            "sourceReference": source_reference,
+            "phone": phone
+        })
+
+        # Set headers for the callback request
+        callback_headers = {
+            'Content-Type': 'application/json'  # Content type for the callback
+        }
+
+        # Create a connection to the callback URL
+        callback_conn = http.client.HTTPSConnection("zimbabwe.mchezoradio.com")
+
+        # Make the POST request to the callback URL
+        callback_conn.request("POST", "/transaction/process", callback_payload, callback_headers)
+
+        # Get the response from the callback
+        callback_res = callback_conn.getresponse()
+        callback_data = callback_res.read()
+        callback_conn.close()
+
+        # Log the response from the callback for debugging
+        print("Callback response:", callback_data.decode("utf-8"))
+
+        # Return the response from the EcoCash API
+        return jsonify(json.loads(eco_response.decode("utf-8"))), res.status
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
