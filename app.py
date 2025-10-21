@@ -15,7 +15,8 @@ def payment():
         data = request.json
         phone = data.get('phone')
         amount = data.get('amount')
-        currency = data.get('currency')  # Default currency for testing
+        currency = data.get('currency') 
+        game = data.get('game')# Default currency for testing
 
         if not phone or not amount or not currency:
             return jsonify({"error": "Missing required fields."}), 400
@@ -56,7 +57,8 @@ def payment():
         # Send the sourceReference and phone number to the specified endpoint
         callback_payload = json.dumps({
             "sourceReference": source_reference,
-            "phone": phone
+            "phone": phone,
+            "game": game
         })
 
         # Set headers for the callback request
