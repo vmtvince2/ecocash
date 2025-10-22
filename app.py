@@ -61,7 +61,8 @@ def payment():
             "sourceReference": source_reference,
             "phone": phone,
             "game": game,
-            "sessionID": sessionID
+            "sessionID": sessionID,
+            "amount" : amount
         })
 
         # Set headers for the callback request
