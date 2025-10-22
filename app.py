@@ -17,6 +17,7 @@ def payment():
         amount = data.get('amount')
         currency = data.get('currency') 
         game = data.get('game')# Default currency for testing
+        sessionID = data.get('sessionID')
 
         if not phone or not amount or not currency:
             return jsonify({"error": "Missing required fields."}), 400
@@ -34,8 +35,8 @@ def payment():
             "amount": amount,
             "reason": "Payment",
             "currency": "USD",
-            "sourceReference": source_reference,
-            "sessionID" : sessionID
+            "sourceReference": source_reference
+            
         })
 
         # Set the headers for EcoCash
