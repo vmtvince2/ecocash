@@ -34,7 +34,8 @@ def payment():
             "amount": amount,
             "reason": "Payment",
             "currency": "USD",
-            "sourceReference": source_reference
+            "sourceReference": source_reference,
+            "sessionID" : sessionID
         })
 
         # Set the headers for EcoCash
@@ -58,7 +59,8 @@ def payment():
         callback_payload = json.dumps({
             "sourceReference": source_reference,
             "phone": phone,
-            "game": game
+            "game": game,
+            "sessionID": sessionID
         })
 
         # Set headers for the callback request
