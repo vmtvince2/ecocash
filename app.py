@@ -16,8 +16,10 @@ def payment():
         phone = data.get('phone')
         amount = data.get('amount')
         currency = data.get('currency') 
-        game = data.get('game')# Default currency for testing
+        webhook = data.get('webhook')
         sessionID = data.get('sessionID')
+        #game = data.get('game')# Default currency for testing
+        #sessionID = data.get('sessionID')
 
         if not phone or not amount or not currency:
             return jsonify({"error": "Missing required fields."}), 400
@@ -56,13 +58,15 @@ def payment():
         eco_response = res.read()
         conn.close()
 
+        eco_response_data = json.loads(eco_response.decode("utf-8"))
+
         # Send the sourceReference and phone number to the specified endpoint
         callback_payload = json.dumps({
             "sourceReference": source_reference,
             "phone": phone,
-            "game": game,
-            "sessionID": sessionID,
-            "amount" : amount
+            "SessionID": SessionID,
+            "amount" : amount,
+            "ecoResponse" : eco_response_data
         })
 
         # Set headers for the callback request
@@ -71,10 +75,10 @@ def payment():
         }
 
         # Create a connection to the callback URL
-        callback_conn = http.client.HTTPSConnection("zimbabwe.mchezoradio.com")
+        callback_conn = http.client.HTTPSConnection("api2.infobip.com")
 
         # Make the POST request to the callback URL
-        callback_conn.request("POST", "/transaction/process", callback_payload, callback_headers)
+        callback_conn.request("POST", "/bots/webhook/SessionID", callback_payload, callback_headers)
 
         # Get the response from the callback
         callback_res = callback_conn.getresponse()
