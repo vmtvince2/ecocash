@@ -64,7 +64,7 @@ def payment():
         callback_payload = json.dumps({
             "sourceReference": source_reference,
             "phone": phone,
-            "SessionID": SessionID,
+            "sessionID": sessionID,
             "amount" : amount,
             "ecoResponse" : eco_response_data
         })
